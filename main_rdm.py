@@ -55,12 +55,12 @@ def get_args_parser():
     parser.add_argument('--warmup_epochs', default=0, type=int)
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='./data/imagenet', type=str,
+    parser.add_argument('--data_path', default='/home/jxl220096/code/rcg/data/imagenet', type=str,
                         help='dataset path')
 
-    parser.add_argument('--output_dir', default='./output_dir',
+    parser.add_argument('--output_dir', default='/home/jxl220096/code/output_dir/train_rdm',
                         help='path where to save, empty for no saving')
-    parser.add_argument('--log_dir', default='./output_dir',
+    parser.add_argument('--log_dir', default='/home/jxl220096/code/output_dir/train_rdm',
                         help='path where to tensorboard log')
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
@@ -139,7 +139,8 @@ def main(args):
         transforms.ToTensor()]
     )
 
-    dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
+    # dataset_train = datasets.ImageFolder(os.path.join(args.data_path, 'train'), transform=transform_train)
+    dataset_train = DatasetPaths(os.path.join(args.data_path, 'train'), transform=transform_train)
     print(dataset_train)
 
     # Jia: We only use one GPU to train
@@ -161,7 +162,7 @@ def main(args):
     #     pin_memory=args.pin_mem,
     #     drop_last=True,
     # )
-    data_loader_train = DatasetPaths(
+    data_loader_train = torch.utils.data.DataLoader(
         dataset=dataset_train,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
@@ -179,7 +180,7 @@ def main(args):
     model.to(device)
 
     model_without_ddp = model
-    print("Model = %s" % str(model_without_ddp))
+    # print("Model = %s" % str(model_without_ddp))
 
     eff_batch_size = args.batch_size * args.accum_iter * misc.get_world_size()
 
