@@ -13,6 +13,11 @@ from rdm.modules.ema import LitEma
 from rdm.modules.diffusionmodules.util import make_beta_schedule, extract_into_tensor, noise_like
 import pretrained_enc.models_pretrained_enc as models_pretrained_enc
 
+# Jia: from imagebind import some packages
+import sys
+sys.path.append('/home/jxl220096/code/ImageBind/')
+from imagebind.models import imagebind_model
+from imagebind.models.imagebind_model import ModalityType
 
 __conditioning_keys__ = {'concat': 'c_concat',
                          'crossattn': 'c_crossattn',
@@ -395,24 +400,26 @@ class RDM(DDPM):
             self.make_cond_schedule()
 
     def instantiate_pretrained_enc(self, config):
-        self.pretrained_encoder = models_pretrained_enc.__dict__[config.params.pretrained_enc_arch](
-            proj_dim=config.params.get("proj_dim", 256))
-        # load pre-trained encoder parameters
-        if 'moco' in config.params.pretrained_enc_arch:
-            self.pretrained_encoder = models_pretrained_enc.load_pretrained_moco(self.pretrained_encoder,
-                                                                                 config.params.pretrained_enc_path)
-        elif 'dino' in config.params.pretrained_enc_arch:
-            self.pretrained_encoder = models_pretrained_enc.load_pretrained_dino(self.pretrained_encoder,
-                                                                                 config.params.pretrained_enc_path)
-        elif 'ibot' in config.params.pretrained_enc_arch:
-            self.pretrained_encoder = models_pretrained_enc.load_pretrained_ibot(self.pretrained_encoder,
-                                                                                 config.params.pretrained_enc_path)
-        elif 'mae' in config.params.pretrained_enc_arch:
-            self.pretrained_encoder = models_pretrained_enc.load_pretrained_mae(self.pretrained_encoder,
-                                                                                config.params.pretrained_enc_path)
-        elif 'deit' in config.params.pretrained_enc_arch:
-            self.pretrained_encoder = models_pretrained_enc.load_pretrained_deit(self.pretrained_encoder,
-                                                                                 config.params.pretrained_enc_path)
+        # self.pretrained_encoder = models_pretrained_enc.__dict__[config.params.pretrained_enc_arch](
+        #     proj_dim=config.params.get("proj_dim", 256))
+        # # load pre-trained encoder parameters
+        # if 'moco' in config.params.pretrained_enc_arch:
+        #     self.pretrained_encoder = models_pretrained_enc.load_pretrained_moco(self.pretrained_encoder,
+        #                                                                          config.params.pretrained_enc_path)
+        # elif 'dino' in config.params.pretrained_enc_arch:
+        #     self.pretrained_encoder = models_pretrained_enc.load_pretrained_dino(self.pretrained_encoder,
+        #                                                                          config.params.pretrained_enc_path)
+        # elif 'ibot' in config.params.pretrained_enc_arch:
+        #     self.pretrained_encoder = models_pretrained_enc.load_pretrained_ibot(self.pretrained_encoder,
+        #                                                                          config.params.pretrained_enc_path)
+        # elif 'mae' in config.params.pretrained_enc_arch:
+        #     self.pretrained_encoder = models_pretrained_enc.load_pretrained_mae(self.pretrained_encoder,
+        #                                                                         config.params.pretrained_enc_path)
+        # elif 'deit' in config.params.pretrained_enc_arch:
+        #     self.pretrained_encoder = models_pretrained_enc.load_pretrained_deit(self.pretrained_encoder,
+        #                                                           config.params.pretrained_enc_path)
+        if 'imagebind' in config.params.pretrained_enc_arch:
+            self.pretrained_encoder = imagebind_model.imagebind_huge(pretrained=True)
         else:
             raise NotImplementedError
 
