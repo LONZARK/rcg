@@ -23,6 +23,8 @@ from engine_rdm import train_one_epoch
 from omegaconf import OmegaConf
 from rdm.util import instantiate_from_config
 
+# Jia: Import Dataset Class from torch.utils.data
+from torch.utils.data import Dataset
 
 def get_args_parser():
     parser = argparse.ArgumentParser('RDM training', add_help=False)
@@ -84,6 +86,26 @@ def get_args_parser():
 
     return parser
 
+# Jia: Define a new Dataloader to return image path.
+class DatasetPaths(Dataset):
+    def __init__(self, root_dir, transform=None):
+        """
+        Args:
+            root_dir (string)
+            transform (callable, optional)
+        """
+        self.root_dir = root_dir
+        self.transform = transform
+        self.paths = [os.path.join(root_dir, fname) for fname in os.listdir(root_dir)]
+
+    def __len__(self):
+        return len(self.paths)
+
+    def __getitem__(self, idx):
+        img_path = self.paths[idx]
+        if self.transform:
+            pass
+        return img_path
 
 def main(args):
     misc.init_distributed_mode(args)
@@ -131,8 +153,16 @@ def main(args):
     
     sampler_train = torch.utils.data.RandomSampler(dataset_train)
 
-    data_loader_train = torch.utils.data.DataLoader(
-        dataset_train, sampler=sampler_train,
+    # # Jia: Replace the dataloader to self-defined dataloader
+    # data_loader_train = torch.utils.data.DataLoader(
+    #     dataset_train, sampler=sampler_train,
+    #     batch_size=args.batch_size,
+    #     num_workers=args.num_workers,
+    #     pin_memory=args.pin_mem,
+    #     drop_last=True,
+    # )
+    data_loader_train = DatasetPaths(
+        dataset=dataset_train,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
