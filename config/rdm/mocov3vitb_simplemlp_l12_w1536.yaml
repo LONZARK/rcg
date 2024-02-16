@@ -24,8 +24,11 @@ model:
         num_res_blocks: 12
     pretrained_enc_config:
       params:
-        pretrained_enc_arch: mocov3_vit_base
-        pretrained_enc_path: pretrained_enc_ckpts/mocov3/vitb.pth.tar
+        # Jia: change encoder to Imagebind
+        # pretrained_enc_arch: mocov3_vit_base
+        # pretrained_enc_path: pretrained_enc_ckpts/mocov3/vitb.pth.tar
+        pretrained_enc_arch: imagebind
+        pretrained_enc_path: /home/jxl220096/code/ImageBind/.checkpoints/imagebind_huge.pth
         proj_dim: 256
         pretrained_enc_withproj: True
     cond_stage_config:
